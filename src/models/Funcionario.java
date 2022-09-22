@@ -6,8 +6,8 @@ public abstract class Funcionario extends Usuario{
 
 	private boolean estacionamento;
 
-	public Funcionario(int id, String nome, double salario, boolean estacionamento) {
-		super(id, nome);
+	public Funcionario(String nome, double salario, boolean estacionamento) {
+		super(nome);
 		this.salario = salario;
 		this.estacionamento = estacionamento;
 	}
