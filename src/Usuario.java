@@ -1,6 +1,6 @@
 public abstract class Usuario {
     private static int actualId = 0;
-    
+
     private int id;
     private String nome;
 
