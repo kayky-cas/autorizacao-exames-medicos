@@ -10,5 +10,5 @@ public abstract class Funcionario extends Usuario{
 		super(nome);
 		this.salario = salario;
 		this.estacionamento = estacionamento;
-		}
 	}
+}
