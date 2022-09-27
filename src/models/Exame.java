@@ -12,8 +12,6 @@ public class Exame {
 
 	private Date data;
 
-	
-
 	public Exame(TipoExames tipo, Date data) {
 		this.tipo = tipo;
 		realizado = false;
@@ -32,5 +30,7 @@ public class Exame {
 		return data;
 	}
 
-	
+	public void realizarExame() {
+		realizado = true;
+	}
 }
