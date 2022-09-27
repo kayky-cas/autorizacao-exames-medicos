@@ -8,9 +8,16 @@ public abstract class Usuario {
 
 	private String nome;
 
-
 	public Usuario(String nome) {
 		id = actualId++;
 		this.nome = nome;
+	}
+
+	public boolean isFucionario() {
+		return this instanceof Funcionario;
+	}
+
+	public boolean isPaciente() {
+		return this instanceof Paciente;
 	}
 }
