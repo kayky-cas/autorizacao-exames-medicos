@@ -28,12 +28,18 @@ public class Medico {
 		return true;
 	}
 
-	public Autorizacao[] listaAutorizacaoPaciente(String cpf){
+	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
+
 		return null;
 	}
 	
-	public Autorizacao[] listaAutorizacaoTipo(TipoExames tipo){
-		return null;
+	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
+		Exame e = new Exame(tipo, null);
+		Autorizacao a = new Autorizacao();
+		if(tipo.equals(e.getTipo())){
+			autorizacoes.add(a);			
+		}
+		return autorizacoes;
 	}
 
 }
