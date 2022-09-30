@@ -16,4 +16,5 @@ public class Autorizacao {
 
 	private Exame exame;
 
+	// Estou fazendo a autorização
 }
