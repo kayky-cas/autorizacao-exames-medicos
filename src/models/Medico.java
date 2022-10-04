@@ -30,11 +30,10 @@ public class Medico {
 
 	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
 		Paciente p = new Paciente();
-		Autorizacao a = new Autorizacao();
 		if(cpf.equals(p.getCpf())){
-			autorizacoes.add(a);			
+			return p.getAutorizacoes();
 		}
-		return autorizacoes;
+		return null;
 	}
 	
 	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
