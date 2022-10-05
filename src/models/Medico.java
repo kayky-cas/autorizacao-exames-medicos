@@ -24,25 +24,33 @@ public class Medico {
 		this.especializacao = especializacao;
 	}
 
-	public boolean addAutorizacao(Autorizacao autorizacao){
+	public boolean incluirAutorizacao(Autorizacao autorizacao){
+		for(Autorizacao a : autorizacoes){
+			if(a.getCodigo() == autorizacao.getCodigo()){
+				return false;
+			}
+		}
+		autorizacoes.add(a);
 		return true;
 	}
 
 	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
-		Paciente p = new Paciente();
-		if(cpf.equals(p.getCpf())){
-			return p.getAutorizacoes();
-		}
-		return null;
-	}
-	
-	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
-		Exame e = new Exame(tipo, null);
-		Autorizacao a = new Autorizacao();
-		if(tipo.equals(e.getTipo())){
-			autorizacoes.add(a);			
+		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
+		for (Autorizacao autorizacao : a) {
+			if(a.getPaciente().getCpf().equals(cpf)){
+				autorizacoes.add(a);	
+			}	
 		}
 		return autorizacoes;
 	}
-
+	
+	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
+		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
+		for (Autorizacao autorizacao : a) {
+			if(a.getExame().getTipo().equals(tipo)){
+				autorizacoes.add(a);	
+			}	
+		}
+		return autorizacoes;
+	}
 }
