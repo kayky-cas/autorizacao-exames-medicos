@@ -1,2 +1,7 @@
-package models;public interface TemAutorizacoes {
+package models;
+
+import java.util.ArrayList;
+
+public interface TemAutorizacoes {
+    ArrayList<Autorizacao> getAutorizacoes();
 }
