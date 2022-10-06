@@ -75,4 +75,10 @@ public class SistemaInterno {
 
 		return folha;
 	}
+
+	public boolean addAutorizacao(Autorizacao autorizacao) {
+		return autorizacoes.add(autorizacao)
+				&& autorizacao.getMedico().addAutorizacao(autorizacao)
+				&& autorizacao.getPaciente().addAutorizacao(autorizacao);
+	}
 }
