@@ -35,4 +35,22 @@ public class SistemaInterno {
 		}
 		return quant;
 	}
+
+	public int quantMedico() {
+		int quant = 0;
+		for (Usuario usuario : usuarios) {
+			if (usuario.isMedico())
+				quant++;
+		}
+		return quant;
+	}
+
+	public int quantPaciente() {
+		int quant = 0;
+		for (Usuario usuario : usuarios) {
+			if (usuario.isPaciente())
+				quant++;
+		}
+		return quant;
+	}
 }
