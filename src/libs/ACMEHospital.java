@@ -22,25 +22,29 @@ public class ACMEHospital {
 	private void selectRole(String option){
 		switch (option) {
 			case "1" -> {
-				if(loginAdmin()){
+				boolean validLogin = loginAdmin();
+				if(validLogin){
 					menuAdmin();
 				}
 				else {
-					changeRole();
+					changeRole("1");
 				}
 			}
 			case "2" -> {
-				if(loginDoctor()){
+				boolean validLogin = loginDoctor();
+				if(validLogin){
 					menuDoctor();
 				}
 				else {
-					changeRole();
+					changeRole("2");
 				}
 			}
-			case "3" -> {if(loginUser()){
+			case "3" -> {
+				boolean validLogin = loginUser();
+				if(validLogin){
 				menuUser();
 				}
-				else{changeRole();}
+				else{changeRole("3");}
 			}
 			default -> {
 				System.out.println("Opçao invalida");
@@ -51,14 +55,14 @@ public class ACMEHospital {
 	private boolean loginAdmin(){return false;}
 	private boolean loginDoctor(){return false;}
 	private boolean loginUser(){return false;}
-	private void changeRole(){
+	private void changeRole(String option){
 		System.out.println("Queres alterar o cargo selecionado?");
 		System.out.println("Caso queira aperte 1:");
 		String s = writeString();
 		if (s.equals("1")) {
 			selectUser();
 		} else {
-			selectRole("1");
+			selectRole(option);
 		}
 	}
 
