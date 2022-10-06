@@ -30,16 +30,7 @@ public class SistemaInterno {
 	public int quantMedico() {
 		int quant = 0;
 		for (Usuario usuario : usuarios) {
-			if (usuario.isMedico())
-				quant++;
-		}
-		return quant;
-	}
-
-	public int quantMedico() {
-		int quant = 0;
-		for (Usuario usuario : usuarios) {
-			if (usuario.isMedico())
+			if (usuario.isFuncionario() && ((Funcionario) usuario).isMedico())
 				quant++;
 		}
 		return quant;
@@ -52,5 +43,5 @@ public class SistemaInterno {
 				quant++;
 		}
 		return quant;
-	}
+		
 }
