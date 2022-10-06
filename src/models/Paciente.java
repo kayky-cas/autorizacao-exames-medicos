@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Paciente extends Usuario implements TemAutorizacoes {
 
-	private String cpf;
+	private final String cpf;
 	private ArrayList<Autorizacao> autorizacoes;
 
 	public Paciente(String nome, String cpf) {
@@ -26,6 +26,10 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 		}
 
 		return false;
+	}
+
+	public String getCpf() {
+		return cpf;
 	}
 
 	@Override
