@@ -5,10 +5,10 @@ public abstract class Funcionario extends Usuario{
 
 	private boolean estacionamento;
 
-	public Funcionario(String nome, double salario) {
+	public Funcionario(String nome, double salario, boolean estacionamento) {
 		super(nome);
 		this.salario = salario;
-		estacionamento = true;
+		this.estacionamento = estacionamento;
 	}
 
 	public boolean isMedico() {

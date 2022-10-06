@@ -14,8 +14,8 @@ public class Medico extends Funcionario implements TemAutorizacoes{
 
 	private ArrayList<Autorizacao> autorizacoes;
 
-	public Medico(String nome, double salario, Especializacao especializacao){
-		super(nome, salario);
+	public Medico(String nome, double salario, Especializacao especializacao, boolean estacionamento){
+		super(nome, salario, estacionamento);
 		this.especializacao = especializacao;
 	}
 
