@@ -34,19 +34,35 @@ public class SistemaInterno {
 
 	public int quantMedico() {
 		int quant = 0;
-		for (Usuario usuario : usuarios) {
+
+		for (Usuario usuario : usuarios)
 			if (usuario.isFuncionario() && ((Funcionario) usuario).isMedico())
 				quant++;
-		}
+
 		return quant;
 	}
 
 	public int quantPaciente() {
 		int quant = 0;
-		for (Usuario usuario : usuarios) {
+
+		for (Usuario usuario : usuarios)
 			if (usuario.isPaciente())
 				quant++;
-		}
+
 		return quant;
+	}
+
+	public int quantAutorizacoes() {
+		return autorizacoes.size();
+	}
+
+	public ArrayList<Exame> examesRealizados() {
+		ArrayList<Exame> exames = new ArrayList<>();
+
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getExame().isRealizado())
+				exames.add(autorizacao.getExame());
+
+		return exames;
 	}
 }

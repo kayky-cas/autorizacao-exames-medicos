@@ -5,7 +5,6 @@ import models.Autorizacao;
 import java.util.ArrayList;
 
 public class Paciente extends Usuario implements TemAutorizacoes {
-
 	private final String cpf;
 	private ArrayList<Autorizacao> autorizacoes;
 
@@ -14,8 +13,6 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 		this.cpf = cpf;
 		autorizacoes = new ArrayList<>();
 	}
-
-
 
 	public boolean realizarExame(int codigoAutorizacao) {
 		for (Autorizacao autorizacao : autorizacoes) {
