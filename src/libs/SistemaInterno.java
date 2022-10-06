@@ -17,4 +17,8 @@ public class SistemaInterno {
 		this.administrador = null;
 		this.autorizacoes = new ArrayList<>();
 	}
+
+	public boolean addUsuario(Usuario usuario) {
+		return usuarios.add(usuario);
+	}
 }
