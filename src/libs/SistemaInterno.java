@@ -65,4 +65,14 @@ public class SistemaInterno {
 
 		return exames;
 	}
+
+	public double folhaSalarial() {
+		double folha = 0;
+
+		for (Usuario usuario : usuarios)
+			if (usuario.isFuncionario())
+				folha += ((Funcionario) usuario).getSalario();
+
+		return folha;
+	}
 }
