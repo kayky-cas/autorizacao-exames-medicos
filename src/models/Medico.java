@@ -7,7 +7,7 @@ import models.Autorizacao;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class Medico extends Funcionario{
+public class Medico extends Funcionario implements TemAutorizacoes{
 	private double salario;
 	private boolean estacionamento;
 	private Especializacao especializacao;
@@ -37,5 +37,28 @@ public class Medico extends Funcionario{
 				autorizacoesPorTipo.add(autorizacao);
 
 		return autorizacoesPorTipo;
+	}
+
+	@Override
+	public ArrayList<Autorizacao> getAutorizacoes() {
+		return null;
+	}
+
+	@Override
+	public boolean addAutorizacao(Autorizacao autorizacao) {
+		for (Autorizacao autorizacaoEmList : autorizacoes)
+			if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
+				return false;
+
+		return autorizacoes.add(autorizacao);
+	}
+
+	@Override
+	public boolean removeAutorizacao(int codigoAutorizacao) {
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getCodigo() == codigoAutorizacao)
+				return autorizacoes.remove(autorizacao);
+
+		return false;
 	}
 }

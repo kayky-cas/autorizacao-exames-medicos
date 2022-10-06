@@ -15,7 +15,7 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 		autorizacoes = new ArrayList<>();
 	}
 
-	
+
 
 	public boolean realizarExame(int codigoAutorizacao) {
 		for (Autorizacao autorizacao : autorizacoes) {
@@ -31,5 +31,23 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 	@Override
 	public ArrayList<Autorizacao> getAutorizacoes() {
 		return autorizacoes;
+	}
+
+	@Override
+	public boolean addAutorizacao(Autorizacao autorizacao) {
+		for (Autorizacao autorizacaoEmList : autorizacoes)
+			if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
+				return false;
+
+		return autorizacoes.add(autorizacao);
+	}
+
+	@Override
+	public boolean removeAutorizacao(int codigoAutorizacao) {
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getCodigo() == codigoAutorizacao)
+				 return autorizacoes.remove(autorizacao);
+
+		return false;
 	}
 }
