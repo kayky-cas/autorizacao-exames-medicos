@@ -8,7 +8,7 @@ public class Autorizacao {
 
 	private int codigo;
 
-	private Date data_cadastro;
+	private Date dataCadastro;
 
 	private Medico medico;
 
@@ -16,31 +16,31 @@ public class Autorizacao {
 
 	private Exame exame;
 
-	public Autorizacao(int codigo, Date data_cadastro, Medico medico, Paciente paciente, Exame exame){
+	public Autorizacao(int codigo, Date dataCadastro, Medico medico, Paciente paciente, Exame exame){
 		this.codigo = codigo;
-		this.data_cadastro = data_cadastro;
+		this.dataCadastro = dataCadastro;
 		this.medico = medico;
 		this.paciente = paciente;
 		this.exame = exame;
 	}
 
-	public int get_codigo(){
+	public int getCodigo(){
 		return codigo;
 	}
 
-	public Date get_data_cadastro(){
-		return data_cadastro;
+	public Date getDataCadastro(){
+		return dataCadastro;
 	}
 
-	public Medico get_medico(){
+	public Medico getMedico(){
 		return medico;
 	}
 
-	public Paciente get_paciente(){
+	public Paciente getPaciente(){
 		return paciente;
 	}
 
-	public Exame get_exame(){
+	public Exame getExame(){
 		return exame;
 	}
 
