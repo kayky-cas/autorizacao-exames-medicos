@@ -21,9 +21,13 @@ public class SistemaInterno {
 
 	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String nome) {
 		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
+
 		for (Usuario usuario : usuarios)
 			if (usuario instanceof TemAutorizacoes && usuario.getNome().equals(nome))
-				autorizacoes.addAll(((TemAutorizacoes) usuario).getAutorizacoes());
+				((TemAutorizacoes) usuario).getAutorizacoes().forEach(a -> {
+					if (!autorizacoes.contains(a))
+						autorizacoes.add(a);
+				});
 
 		return autorizacoes;
 	}
