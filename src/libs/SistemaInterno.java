@@ -1,12 +1,13 @@
 package libs;
 
+import exceptions.UserException;
 import models.*;
 
 import java.util.ArrayList;
 
 public class SistemaInterno {
 	private final ArrayList<Usuario> usuarios;
-	private Administrador administrador;
+	private Usuario administrador;
 	private final ArrayList<Autorizacao> autorizacoes;
 
 	public SistemaInterno() {
@@ -80,5 +81,16 @@ public class SistemaInterno {
 		return autorizacoes.add(autorizacao)
 				&& autorizacao.getMedico().addAutorizacao(autorizacao)
 				&& autorizacao.getPaciente().addAutorizacao(autorizacao);
+	}
+
+	public void isLogado() throws UserException {
+		if (administrador == null)
+			throw new UserException("Invalid user", "O usuário não está logado!");
+
+		if (!administrador.isFuncionario())
+			throw new UserException("Invalid user", "O usuário não pode acessar o Sitema Interno");
+
+		if (!((Funcionario) administrador).isAdministrador())
+			throw new UserException("Invalid user", "O usuário não pode acessar o Sitema Interno");
 	}
 }
