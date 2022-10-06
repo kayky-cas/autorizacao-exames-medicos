@@ -1,7 +1,6 @@
 package models;
 
 public abstract class Funcionario extends Usuario{
-
 	private double salario;
 
 	private boolean estacionamento;
@@ -12,4 +11,11 @@ public abstract class Funcionario extends Usuario{
 		estacionamento = true;
 	}
 
+	public boolean isMedico() {
+		return this instanceof Medico;
+	}
+
+	public boolean isAdministrador() {
+		return this instanceof Medico;
+	}
 }
