@@ -16,11 +16,22 @@ public class SistemaInterno {
 		this.autorizacoes = new ArrayList<>();
 	}
 
-	public boolean addUsuario(Usuario usuario) {
+	public void login(Usuario usuario) {
+		this.administrador = usuario;
+	}
+
+	public void logout() {
+		this.administrador = null;
+	}
+
+	public boolean addUsuario(Usuario usuario) throws UserException {
+		isLogado();
 		return usuarios.add(usuario);
 	}
 
-	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String nome) {
+	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String nome) throws UserException {
+		isLogado();
+
 		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
 
 		for (Usuario usuario : usuarios)
@@ -33,7 +44,9 @@ public class SistemaInterno {
 		return autorizacoes;
 	}
 
-	public int quantMedico() {
+	public int quantMedico() throws UserException {
+		isLogado();
+
 		int quant = 0;
 
 		for (Usuario usuario : usuarios)
@@ -43,7 +56,9 @@ public class SistemaInterno {
 		return quant;
 	}
 
-	public int quantPaciente() {
+	public int quantPaciente() throws UserException {
+		isLogado();
+
 		int quant = 0;
 
 		for (Usuario usuario : usuarios)
@@ -53,11 +68,15 @@ public class SistemaInterno {
 		return quant;
 	}
 
-	public int quantAutorizacoes() {
+	public int quantAutorizacoes() throws UserException {
+		isLogado();
+
 		return autorizacoes.size();
 	}
 
-	public ArrayList<Exame> examesRealizados() {
+	public ArrayList<Exame> examesRealizados() throws UserException {
+		isLogado();
+
 		ArrayList<Exame> exames = new ArrayList<>();
 
 		for (Autorizacao autorizacao : autorizacoes)
@@ -67,7 +86,9 @@ public class SistemaInterno {
 		return exames;
 	}
 
-	public double folhaSalarial() {
+	public double folhaSalarial() throws UserException {
+		isLogado();
+
 		double folha = 0;
 
 		for (Usuario usuario : usuarios)
@@ -77,7 +98,9 @@ public class SistemaInterno {
 		return folha;
 	}
 
-	public boolean addAutorizacao(Autorizacao autorizacao) {
+	public boolean addAutorizacao(Autorizacao autorizacao) throws UserException {
+		isLogado();
+
 		return autorizacoes.add(autorizacao)
 				&& autorizacao.getMedico().addAutorizacao(autorizacao)
 				&& autorizacao.getPaciente().addAutorizacao(autorizacao);
