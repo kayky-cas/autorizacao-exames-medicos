@@ -12,4 +12,12 @@ public abstract class Usuario {
 		id = actualId++;
 		this.nome = nome;
 	}
+
+	public boolean isPaciente() {
+		return this instanceof Paciente;
+	}
+
+	public boolean isFuncionario() {
+		return this instanceof Funcionario;
+	}
 }
