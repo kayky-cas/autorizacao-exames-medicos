@@ -43,5 +43,5 @@ public class SistemaInterno {
 				quant++;
 		}
 		return quant;
-		
+	}
 }
