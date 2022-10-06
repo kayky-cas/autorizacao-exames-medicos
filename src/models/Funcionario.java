@@ -11,6 +11,10 @@ public abstract class Funcionario extends Usuario{
 		this.estacionamento = estacionamento;
 	}
 
+	public double getSalario() {
+		return salario;
+	}
+
 	public boolean isMedico() {
 		return this instanceof Medico;
 	}
