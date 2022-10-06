@@ -19,12 +19,13 @@ public class SistemaInterno {
 		return usuarios.add(usuario);
 	}
 
-	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String cpf) {
+	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String nome) {
+		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
 		for (Usuario usuario : usuarios)
-			if (usuario instanceof TemAutorizacoes && usuario.getCPF().equals(cpf))
-				return ((TemAutorizacoes) usuario).getAutorizacoes();
+			if (usuario instanceof TemAutorizacoes && usuario.getNome().equals(nome))
+				autorizacoes.addAll(((TemAutorizacoes) usuario).getAutorizacoes());
 
-		return null;
+		return autorizacoes;
 	}
 
 	public int quantMedico() {
