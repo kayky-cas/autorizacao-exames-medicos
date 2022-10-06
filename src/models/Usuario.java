@@ -8,7 +8,6 @@ public abstract class Usuario {
 
 	private String nome;
 
-
 	public Usuario(String nome) {
 		id = actualId++;
 		this.nome = nome;

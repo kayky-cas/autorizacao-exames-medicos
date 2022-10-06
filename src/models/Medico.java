@@ -4,46 +4,38 @@ import enums.Especializacao;
 import enums.TipoExames;
 import models.Autorizacao;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class Medico {
-
-	private int id;
-	private String nome;
+public class Medico extends Funcionario{
 	private double salario;
 	private boolean estacionamento;
 	private Especializacao especializacao;
 
 	private ArrayList<Autorizacao> autorizacoes;
 
-	public Medico(int id, String nome, double salario, boolean estacionamento, Especializacao especializacao){
-		this.id = id;
-		this.nome = nome;
-		this.salario = salario;
-		this.estacionamento = estacionamento;
+	public Medico(String nome, double salario, Especializacao especializacao){
+		super(nome, salario);
 		this.especializacao = especializacao;
 	}
 
-	public boolean addAutorizacao(Autorizacao autorizacao){
-		return true;
-	}
-
 	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
-		Paciente p = new Paciente();
-		Autorizacao a = new Autorizacao();
-		if(cpf.equals(p.getCpf())){
-			autorizacoes.add(a);			
-		}
-		return autorizacoes;
+		ArrayList<Autorizacao> autorizacoesPorPaciente = new ArrayList<>();
+
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getPaciente().getCpf() == cpf)
+				autorizacoesPorPaciente.add(autorizacao);
+
+		return autorizacoesPorPaciente;
 	}
 	
-	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
-		Exame e = new Exame(tipo, null);
-		Autorizacao a = new Autorizacao();
-		if(tipo.equals(e.getTipo())){
-			autorizacoes.add(a);			
-		}
-		return autorizacoes;
-	}
+	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo) {
+		ArrayList<Autorizacao> autorizacoesPorTipo = new ArrayList<>();
 
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getExame().getTipo() == tipo)
+				autorizacoesPorTipo.add(autorizacao);
+
+		return autorizacoesPorTipo;
+	}
 }
