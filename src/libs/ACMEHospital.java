@@ -6,8 +6,6 @@ import models.*;
 
 public class ACMEHospital {
 
-	private final SistemaInterno sistema = new SistemaInterno();
-
 	private Usuario usuarioAtual;
 
 	public void inicializa() {

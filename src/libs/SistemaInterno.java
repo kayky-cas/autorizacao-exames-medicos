@@ -10,8 +10,8 @@ public class SistemaInterno {
 	private Usuario administrador;
 	private final ArrayList<Autorizacao> autorizacoes;
 
-	public SistemaInterno() {
-		this.usuarios = new ArrayList<>();
+	public SistemaInterno(ArrayList<Usuario> usuarios) {
+		this.usuarios = usuarios;
 		this.administrador = null;
 		this.autorizacoes = new ArrayList<>();
 	}
