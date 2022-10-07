@@ -207,7 +207,16 @@ public class ACMEHospital {
 						
 						[Y] Sim\s
 						[N] Nao\s""");
-
+				char c = digitaOpcaoChar();
+				switch (c) {
+					case 'Y' -> {
+						boolean estacionado = true;
+					}
+					case 'N' -> {
+						System.out.println("\nQuantidade de vagas disponiveis " +
+								"no estacionamento do hospital: " + checaEstacionamento());
+					}
+				}
 			}
 		}
 	}
