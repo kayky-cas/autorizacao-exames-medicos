@@ -10,12 +10,15 @@ import models.*;
 
 public class ACMEHospital {
 
+<<<<<<< HEAD
 	private final SistemaInterno sistemaInt = new SistemaInterno();
 
 	//private final Sistema sistema = new Sistema();
 
 	private final Scanner entrada = new Scanner(System.in);
 
+=======
+>>>>>>> 03cc2b2271e419db92cb2cf2298415b2749dea56
 	private Usuario usuarioAtual;
 
 	public void inicializa() {

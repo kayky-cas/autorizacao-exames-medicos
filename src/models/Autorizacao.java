@@ -4,7 +4,8 @@ import models.Exame;
 
 import java.util.Date;
 
-public class Autorizacao {
+public class Autorizacao implements Comparable<Autorizacao> {
+	private static int actualCodigo = 0;
 
 	private int codigo;
 
@@ -16,8 +17,8 @@ public class Autorizacao {
 
 	private Exame exame;
 
-	public Autorizacao(int codigo, Date dataCadastro, Medico medico, Paciente paciente, Exame exame){
-		this.codigo = codigo;
+	public Autorizacao(Date dataCadastro, Medico medico, Paciente paciente, Exame exame){
+		this.codigo = actualCodigo++;
 		this.dataCadastro = dataCadastro;
 		this.medico = medico;
 		this.paciente = paciente;
@@ -44,4 +45,8 @@ public class Autorizacao {
 		return exame;
 	}
 
+	@Override
+	public int compareTo(Autorizacao o) {
+		return this.dataCadastro.compareTo(o.getDataCadastro());
+	}
 }

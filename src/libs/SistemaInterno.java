@@ -1,119 +1,210 @@
 package libs;
 
+import enums.TipoExames;
 import exceptions.UserException;
 import models.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 
 public class SistemaInterno {
-	private final ArrayList<Usuario> usuarios;
-	private Usuario administrador;
-	private final ArrayList<Autorizacao> autorizacoes;
+    private final ArrayList<Usuario> usuarios;
+    private Usuario usuario;
+    private final ArrayList<Autorizacao> autorizacoes;
 
-	public SistemaInterno() {
-		this.usuarios = new ArrayList<>();
-		this.administrador = null;
-		this.autorizacoes = new ArrayList<>();
-	}
+    private int estacionamento;
 
-	public void login(Usuario usuario) {
-		this.administrador = usuario;
-	}
+    public SistemaInterno(int estacionamento) {
+        this.usuarios = new ArrayList<>();
+        this.usuario = null;
+        this.autorizacoes = new ArrayList<>();
+        this.estacionamento = estacionamento;
+    }
 
-	public void logout() {
-		this.administrador = null;
-	}
+    private void isLogado() throws UserException {
+        if (usuario == null)
+            throw new UserException("Nenhum usuário logado!");
+    }
 
-	public boolean addUsuario(Usuario usuario) throws UserException {
-		isLogado();
-		return usuarios.add(usuario);
-	}
+    public void login(int id) throws UserException {
+        if (usuario != null)
+            throw new UserException("Usuário já logado!");
 
-	public ArrayList<Autorizacao> searchAutorizacaoPorNome(String nome) throws UserException {
-		isLogado();
+        for (Usuario u : usuarios)
+            if (u.getId() == id) {
+                usuario = u;
+                return;
+            }
 
-		ArrayList<Autorizacao> autorizacoes = new ArrayList<>();
+        throw new UserException("Identificador inválido");
+    }
 
-		for (Usuario usuario : usuarios)
-			if (usuario instanceof TemAutorizacoes && usuario.getNome().equals(nome))
-				((TemAutorizacoes) usuario).getAutorizacoes().forEach(a -> {
-					if (!autorizacoes.contains(a))
-						autorizacoes.add(a);
-				});
+    public void logout() throws UserException {
+        isLogado();
+        this.usuario = null;
+    }
 
-		return autorizacoes;
-	}
+    private void validUsuario(boolean condicao) throws UserException {
+        if (!condicao)
+            throw new UserException("Tipo de usuário inválido!");
+    }
 
-	public int quantMedico() throws UserException {
-		isLogado();
+    private void validAdmin() throws UserException {
+        validUsuario(this.usuario.isFuncionario() && ((Funcionario) this.usuario).isAdministrador());
+    }
 
-		int quant = 0;
+    private void validMedico() throws UserException {
+        validUsuario(usuario.isFuncionario() && ((Funcionario) usuario).isMedico());
+    }
 
-		for (Usuario usuario : usuarios)
-			if (usuario.isFuncionario() && ((Funcionario) usuario).isMedico())
-				quant++;
+    public boolean addUsuario(Usuario usuario) throws UserException {
+        validAdmin();
+        return usuarios.add(usuario);
+    }
 
-		return quant;
-	}
+    public TemAutorizacoes listPacienteMedicoPorNome(String nome) throws UserException {
+        validAdmin();
 
-	public int quantPaciente() throws UserException {
-		isLogado();
+        for (Usuario usuario : usuarios)
+            if (usuario instanceof TemAutorizacoes && usuario.getNome().equals(nome))
+                return (TemAutorizacoes) usuario;
 
-		int quant = 0;
+        throw new IllegalArgumentException("Nome não encontrado!");
+    }
 
-		for (Usuario usuario : usuarios)
-			if (usuario.isPaciente())
-				quant++;
+    public int quantMedico() throws UserException {
+        validAdmin();
 
-		return quant;
-	}
+        int quant = 0;
 
-	public int quantAutorizacoes() throws UserException {
-		isLogado();
+        for (Usuario usuario : usuarios)
+            if (usuario.isFuncionario() && ((Funcionario) usuario).isMedico())
+                quant++;
 
-		return autorizacoes.size();
-	}
+        return quant;
+    }
 
-	public ArrayList<Exame> examesRealizados() throws UserException {
-		isLogado();
+    public int quantPaciente() throws UserException {
+        validAdmin();
 
-		ArrayList<Exame> exames = new ArrayList<>();
+        int quant = 0;
 
-		for (Autorizacao autorizacao : autorizacoes)
-			if (autorizacao.getExame().isRealizado())
-				exames.add(autorizacao.getExame());
+        for (Usuario usuario : usuarios)
+            if (usuario.isPaciente())
+                quant++;
 
-		return exames;
-	}
+        return quant;
+    }
 
-	public double folhaSalarial() throws UserException {
-		isLogado();
+    public int quantAutorizacoes() throws UserException {
+        validAdmin();
 
-		double folha = 0;
+        return autorizacoes.size();
+    }
 
-		for (Usuario usuario : usuarios)
-			if (usuario.isFuncionario())
-				folha += ((Funcionario) usuario).getSalario();
+    public double percentualAutorizacoesRealizadas() throws UserException {
+        validAdmin();
 
-		return folha;
-	}
+        int cont = 0;
 
-	public boolean addAutorizacao(Autorizacao autorizacao) throws UserException {
-		isLogado();
+        for (Autorizacao autorizacao : autorizacoes)
+            if (autorizacao.getExame().isRealizado())
+                cont++;
 
-		return autorizacoes.add(autorizacao)
-				&& autorizacao.getMedico().addAutorizacao(autorizacao)
-				&& autorizacao.getPaciente().addAutorizacao(autorizacao);
-	}
+        return ((double) cont) * 100 / autorizacoes.size();
+    }
 
-	public void isLogado() throws UserException {
-		if (administrador == null)
-			throw new UserException("Invalid user", "O usuário não está logado!");
+    public double folhaSalarial() throws UserException {
+        validAdmin();
 
-		if (!administrador.isFuncionario())
-			throw new UserException("Invalid user", "O usuário não pode acessar o Sitema Interno");
+        double folha = 0;
 
-		if (!((Funcionario) administrador).isAdministrador())
-			throw new UserException("Invalid user", "O usuário não pode acessar o Sitema Interno");
-	}
+        for (Usuario usuario : usuarios)
+            if (usuario.isFuncionario())
+                folha += ((Funcionario) usuario).getSalario();
+
+        return folha;
+    }
+
+    public boolean addAutorizacao(Autorizacao autorizacao) throws UserException {
+        validMedico();
+
+        if (autorizacoes.add(autorizacao)
+                && autorizacao.getMedico().addAutorizacao(autorizacao)
+                && autorizacao.getPaciente().addAutorizacao(autorizacao)) {
+            Collections.sort(autorizacoes);
+            return true;
+        }
+
+        return false;
+    }
+
+    public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf) throws UserException {
+        validMedico();
+
+        ArrayList<Autorizacao> autorizacoesPorPaciente = new ArrayList<>();
+
+        for (Autorizacao autorizacao : autorizacoes)
+            if (autorizacao.getPaciente().getCpf() == cpf)
+                autorizacoesPorPaciente.add(autorizacao);
+
+        return autorizacoesPorPaciente;
+    }
+
+    public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo) throws UserException {
+        validMedico();
+
+        ArrayList<Autorizacao> autorizacoesPorTipo = new ArrayList<>();
+
+        for (Autorizacao autorizacao : autorizacoes)
+            if (autorizacao.getExame().getTipo() == tipo)
+                autorizacoesPorTipo.add(autorizacao);
+
+        return autorizacoesPorTipo;
+    }
+
+    public boolean realizarExame(int codigoAutorizacao, Date dataAtual) throws UserException {
+        validUsuario(usuario.isPaciente());
+
+        Paciente paciente = (Paciente) usuario;
+
+        for (Autorizacao autorizacao : paciente.getAutorizacoes()) {
+            if (autorizacao.getCodigo() == codigoAutorizacao) {
+                if (autorizacao.getDataCadastro().after(dataAtual) &&
+                        diferencaEntreDias(autorizacao.getDataCadastro(), dataAtual) <= 30) {
+                    autorizacao.getExame().realizarExame();
+                    return true;
+                } else
+                    return false;
+
+            }
+        }
+
+        return false;
+    }
+
+    public ArrayList<Autorizacao> listarMinhasAutorizacoes() throws UserException {
+        validUsuario(usuario.isPaciente());
+        validMedico();
+
+        return ((Paciente) usuario).getAutorizacoes();
+    }
+
+    private int diferencaEntreDias(Date date1, Date date2) {
+        long mili = date2.getTime() - date1.getTime();
+        return (int) (mili / 1000 / 60 / 60 / 24);
+    }
+
+    private int vagasLivresNoEstacionamento() throws UserException {
+        validAdmin();
+
+        int quant = 0;
+
+        for (Usuario usuario : usuarios)
+            if (usuario.isFuncionario() && ((Funcionario) usuario).estaEstacionado())
+                quant++;
+
+        return quant;
+    }
 }

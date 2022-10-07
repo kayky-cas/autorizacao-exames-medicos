@@ -3,6 +3,7 @@ package models;
 import models.Autorizacao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Paciente extends Usuario implements TemAutorizacoes {
 	private final String cpf;
@@ -14,24 +15,13 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 		autorizacoes = new ArrayList<>();
 	}
 
-	public boolean realizarExame(int codigoAutorizacao) {
-		for (Autorizacao autorizacao : autorizacoes) {
-			if (autorizacao.getCodigo() == codigoAutorizacao) {
-				autorizacao.getExame().realizarExame();
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	public String getCpf() {
 		return cpf;
 	}
 
 	@Override
 	public ArrayList<Autorizacao> getAutorizacoes() {
-		return autorizacoes;
+		return new ArrayList<>(this.autorizacoes);
 	}
 
 	@Override
@@ -40,7 +30,12 @@ public class Paciente extends Usuario implements TemAutorizacoes {
 			if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
 				return false;
 
-		return autorizacoes.add(autorizacao);
+		if (autorizacoes.add(autorizacao)) {
+			Collections.sort(autorizacoes);
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
