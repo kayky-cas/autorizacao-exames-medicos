@@ -5,15 +5,17 @@ import models.Exame;
 import java.util.Date;
 
 public class Autorizacao {
-
 	private int codigo;
-
 	private Date data;
-
 	private Medico medico;
-
 	private Paciente paciente;
-
 	private Exame exame;
 
+	public Paciente getPaciente() {
+		return paciente;
+	}
+
+	public Exame getExame() {
+		return exame;
+	}
 }

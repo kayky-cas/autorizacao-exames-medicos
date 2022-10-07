@@ -5,11 +5,8 @@ import enums.TipoExames;
 import java.util.Date;
 
 public class Exame {
-
 	private TipoExames tipo;
-
 	private boolean realizado;
-
 	private Date data;
 
 	public Exame(TipoExames tipo, Date data) {
@@ -24,6 +21,10 @@ public class Exame {
 
 	public boolean isRealizado() {
 		return realizado;
+	}
+
+	public void setRealizado(boolean realiza){
+		this.realizado = realiza;
 	}
 
 	public Date getData() {
