@@ -6,6 +6,7 @@ import models.Autorizacao;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Medico extends Funcionario implements TemAutorizacoes{
 	private double salario;
@@ -19,29 +20,9 @@ public class Medico extends Funcionario implements TemAutorizacoes{
 		this.especializacao = especializacao;
 	}
 
-	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
-		ArrayList<Autorizacao> autorizacoesPorPaciente = new ArrayList<>();
-
-		for (Autorizacao autorizacao : autorizacoes)
-			if (autorizacao.getPaciente().getCpf() == cpf)
-				autorizacoesPorPaciente.add(autorizacao);
-
-		return autorizacoesPorPaciente;
-	}
-	
-	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo) {
-		ArrayList<Autorizacao> autorizacoesPorTipo = new ArrayList<>();
-
-		for (Autorizacao autorizacao : autorizacoes)
-			if (autorizacao.getExame().getTipo() == tipo)
-				autorizacoesPorTipo.add(autorizacao);
-
-		return autorizacoesPorTipo;
-	}
-
 	@Override
 	public ArrayList<Autorizacao> getAutorizacoes() {
-		return null;
+		return new ArrayList<>(this.autorizacoes);
 	}
 
 	@Override
@@ -50,7 +31,12 @@ public class Medico extends Funcionario implements TemAutorizacoes{
 			if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
 				return false;
 
-		return autorizacoes.add(autorizacao);
+		if (autorizacoes.add(autorizacao)) {
+			Collections.sort(autorizacoes);
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
