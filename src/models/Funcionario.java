@@ -24,6 +24,6 @@ public abstract class Funcionario extends Usuario {
     }
 
     public boolean isAdministrador() {
-        return this instanceof Medico;
+        return this instanceof Administrador;
     }
 }
