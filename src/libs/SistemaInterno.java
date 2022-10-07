@@ -205,6 +205,6 @@ public class SistemaInterno {
             if (usuario.isFuncionario() && ((Funcionario) usuario).estaEstacionado())
                 quant++;
 
-        return quant;
+        return estacionamento - quant;
     }
 }
