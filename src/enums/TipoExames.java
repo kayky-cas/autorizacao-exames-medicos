@@ -1,16 +1,20 @@
 package enums;
 
 public enum TipoExames {
-    HEMOGRAMA("hemograma"),
-    PAPANICOLAU("papanicolau"),
-    URINA("urina"),
-    FEZES("fezes"),
-    COLESTEROL("colesterol"),
-    SANGUE("sangue");
-    
-    private String nome;
+    HEMOGRAMA("Hemograma"),
+    PAPANICOLAU("Papanicolau"),
+    URINA("Urina"),
+    FEZES("Fezes"),
+    COLESTEROL("Colesterol"),
+    SANGUE("Sangue"),
+    GLICEMIA("Glicemia"),
+    TRANSAMINASES("Transaminases"),
+    TSH("TSH"),
+    UREAIA("Ureia");
 
-    private TipoExames(String nome){
+    private final String nome;
+
+    TipoExames(String nome){
         this.nome = nome;
     }
 

@@ -3,51 +3,47 @@ package models;
 import models.Autorizacao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+public class Paciente extends Usuario implements TemAutorizacoes {
+	private final String cpf;
+	private ArrayList<Autorizacao> autorizacoes;
 
-public class Paciente extends Usuario {
+	public Paciente(String nome, String cpf) {
+		super(nome);
+		this.cpf = cpf;
+		autorizacoes = new ArrayList<>();
+	}
 
-    private int id;
-    private String nome;
-    private String cpf;
-    private ArrayList<Autorizacao> autorizacoes;
+	public String getCpf() {
+		return cpf;
+	}
 
-    public Paciente(String cpf, String nome) {
-        super(nome);
-        this.cpf = cpf;
-        autorizacoes = new ArrayList<>();
-    }
+	@Override
+	public ArrayList<Autorizacao> getAutorizacoes() {
+		return new ArrayList<>(this.autorizacoes);
+	}
 
-    public int getId() {
-        return id;
-    }
+	@Override
+	public boolean addAutorizacao(Autorizacao autorizacao) {
+		for (Autorizacao autorizacaoEmList : autorizacoes)
+			if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
+				return false;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+		if (autorizacoes.add(autorizacao)) {
+			Collections.sort(autorizacoes);
+			return true;
+		}
 
-    public String getNome() {
-        return nome;
-    }
+		return false;
+	}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	@Override
+	public boolean removeAutorizacao(int codigoAutorizacao) {
+		for (Autorizacao autorizacao : autorizacoes)
+			if (autorizacao.getCodigo() == codigoAutorizacao)
+				 return autorizacoes.remove(autorizacao);
 
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public ArrayList<Autorizacao> getAutorizacoes() {
-        return autorizacoes;
-    }
-
-    public void setAutorizacoes(ArrayList<Autorizacao> autorizacoes) {
-        this.autorizacoes = autorizacoes;
-    }
-
+		return false;
+	}
 }

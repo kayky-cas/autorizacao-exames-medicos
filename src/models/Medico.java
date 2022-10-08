@@ -4,46 +4,48 @@ import enums.Especializacao;
 import enums.TipoExames;
 import models.Autorizacao;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class Medico {
+public class Medico extends Funcionario implements TemAutorizacoes {
+    private double salario;
+    private boolean estacionamento;
+    private Especializacao especializacao;
 
-	private int id;
-	private String nome;
-	private double salario;
-	private boolean estacionamento;
-	private Especializacao especializacao;
+    private ArrayList<Autorizacao> autorizacoes;
 
-	private ArrayList<Autorizacao> autorizacoes;
+    public Medico(String nome, double salario, Especializacao especializacao, boolean estacionamento) {
+        super(nome, salario, estacionamento);
+        this.especializacao = especializacao;
+        autorizacoes = new ArrayList<>();
+    }
 
-	public Medico(int id, String nome, double salario, boolean estacionamento, Especializacao especializacao){
-		this.id = id;
-		this.nome = nome;
-		this.salario = salario;
-		this.estacionamento = estacionamento;
-		this.especializacao = especializacao;
-	}
+    @Override
+    public ArrayList<Autorizacao> getAutorizacoes() {
+        return new ArrayList<>(this.autorizacoes);
+    }
 
-	public boolean addAutorizacao(Autorizacao autorizacao){
-		return true;
-	}
+    @Override
+    public boolean addAutorizacao(Autorizacao autorizacao) {
+        for (Autorizacao autorizacaoEmList : autorizacoes)
+            if (autorizacao.getCodigo() == autorizacaoEmList.getCodigo())
+                return false;
 
-	public ArrayList<Autorizacao> listaAutorizacaoPaciente(String cpf){
-		Paciente p = new Paciente();
-		Autorizacao a = new Autorizacao();
-		if(cpf.equals(p.getCpf())){
-			autorizacoes.add(a);			
-		}
-		return autorizacoes;
-	}
-	
-	public ArrayList<Autorizacao> listaAutorizacaoTipo(TipoExames tipo){
-		Exame e = new Exame(tipo, null);
-		Autorizacao a = new Autorizacao();
-		if(tipo.equals(e.getTipo())){
-			autorizacoes.add(a);			
-		}
-		return autorizacoes;
-	}
+        if (autorizacoes.add(autorizacao)) {
+            Collections.sort(autorizacoes);
+            return true;
+        }
 
+        return false;
+    }
+
+    @Override
+    public boolean removeAutorizacao(int codigoAutorizacao) {
+        for (Autorizacao autorizacao : autorizacoes)
+            if (autorizacao.getCodigo() == codigoAutorizacao)
+                return autorizacoes.remove(autorizacao);
+
+        return false;
+    }
 }
