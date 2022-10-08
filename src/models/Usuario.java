@@ -28,4 +28,8 @@ public abstract class Usuario {
 	public boolean isFuncionario() {
 		return this instanceof Funcionario;
 	}
+
+	public static void invalidarUsuario() {
+		actualId--;
+	}
 }

@@ -1,400 +1,567 @@
 package libs;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Scanner;
 
 import enums.Especializacao;
 import enums.TipoExames;
-import exceptions.InvalidOption;
 import exceptions.UserException;
 import models.*;
 
 public class ACMEHospital {
 
-	private final SistemaInterno sistemaInt = new SistemaInterno(1000);
+    public final int MAX_ESTACIONAMENTO = 1000;
 
-	private final Scanner entrada = new Scanner(System.in);
+    private SistemaInterno sistemaInt = new SistemaInterno(MAX_ESTACIONAMENTO);
 
-	private Usuario usuarioAtual;
+    private final Scanner entrada = new Scanner(System.in);
 
-	public void inicializa() {
-		Medico medico = new Medico("Jorge", 5500.0, Especializacao.CARDIOLOGISTA, true);
-		Paciente paciente = new Paciente("Carlos", "000.000.000-00");
-		Administrador adm = new Administrador("Marcela", 11000.0, true, 1);
-	}
+    public void inicializa() {
+        Medico medico = new Medico("Jorge", 5500.0, Especializacao.CARDIOLOGISTA, true);
+        Paciente paciente = new Paciente("Carlos", "000.000.000-00");
+        Administrador adm = new Administrador("Marcela", 11000.0, true, 1);
 
-	public void executa() throws InvalidOption, UserException {
-		int opcao;
-		do {
-			menuInicial();
-			opcao = entrada.nextInt();
-			entrada.nextLine();
-			switch(opcao){
-				case 0 -> { System.out.println("""
-							 
-								Muito obrigado por utilizar ACME Hospital!\s
-								Volte sempre :)""");
-				}
-				case 1 -> menuAdm();
-				case 2 -> menuMed();
-				case 3 -> menuPac();
-			}
+        ArrayList<Usuario> usuarios = new ArrayList<>();
 
-		} while (opcao!=0);
-	}
+        usuarios.add(medico);
+        usuarios.add(paciente);
+        usuarios.add(adm);
 
-	public void menuInicial() {
-		System.out.println("""
-    
-				\n>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-				
-				Bem-vinde ao ACME Hospital!\s
+        sistemaInt = new SistemaInterno(MAX_ESTACIONAMENTO, usuarios);
 
-				Escolha a forma que voce deseja entrar no sistema: \s
-								
-				[0] Sair do sistema\s
-				[1] Entrar como Administrador\s
-				[2] Entrar como Medico\s
-				[3] Entrar como Paciente\s""");
-	}
+        System.out.printf("""
+                        Usuários pré-cadastrados:\s
+                        \tid: %d %s (Médico)
+                        \tid: %d %s (Paciente)
+                        \tid: %d %s (Administrador (Código de Autorização: %d))""",
+                medico.getId(),
+                medico.getNome(),
+                paciente.getId(),
+                paciente.getNome(),
+                adm.getId(),
+                adm.getNome(),
+                adm.getAuthNumber());
+    }
 
-	public void menuTroca() {
-		System.out.println("""
-    			
-				\nVoce quer trocar para: \s
-								
-				[0] Sair do sistema\s
-				[1] Administrador\s
-				[2] Medico\s
-				[3] Paciente\s""");
-	}
+    public void executa() {
+        int opcao = 0;
+        do {
+            if (sistemaInt.getUsuario() == null) {
+                opcao = semUsuario();
+                continue;
+            }
+            if (sistemaInt.getUsuario().isPaciente()) {
+                opcao = escolhaPac();
+                continue;
+            }
+            if (sistemaInt.getUsuario().isFuncionario()) {
+                Funcionario funcionario = (Funcionario) sistemaInt.getUsuario();
 
-	public void menuAdm() throws InvalidOption, UserException {
-		sistemaInt.login(usuarioAtual.getId());
-		System.out.println("""
-    
-				\n>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-								
-				> Voce entrou como: ADMINISTRADOR\s
-								
-				>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-								
-				> MENU ADMINISTRADOR\s
-								
-				O que deseja fazer?\s
-				(Selecione a opcao abaixo digitando o numero indicado)\s
-								
-				[0] Sair do sistema\s
-				[1] Cadastrar novo usuario\s
-				[2] Buscar um medico\s
-				[3] Buscar um paciente\s
-				[4] Estatisticas gerais\s
-				[5] Ver folha salarial dos funcionarios\s
-				[6] Checar vagas do estacionamento do hospital\s
-				[7] Trocar de usuario\s
-								
-				Digite a opcao desejada:\s""");
-		try {
-			escolhaAdmin();
-		} catch (Exception a) {
-			System.err.println("Ocorreu um erro: " + a);
-		}
-	}
+                if (funcionario.isMedico()) {
+                    opcao = escolhaMed();
+                    continue;
+                }
+                if (funcionario.isAdministrador()) {
+                    opcao = escolhaAdmin();
+                }
+            }
+        } while (opcao != 0);
+    }
 
-	private void trocaUsuario() throws InvalidOption, UserException {
-		int opcao;
-		do {
-			menuTroca();
-			opcao = entrada.nextInt();
-			entrada.nextLine();
-			switch(opcao){
-				case 0 -> { System.out.println("""
-							 
-								Muito obrigado por utilizar ACME Hospital!\s
-								Volte sempre :)""");
-				}
-				case 1 -> menuAdm();
-				case 2 -> menuMed();
-				case 3 -> menuPac();
-			}
+    public int semUsuario() {
+        int opcao;
+        menuInicial();
+        opcao = entrada.nextInt();
+        switch (opcao) {
+            case 0 -> {
+                System.out.println("""
+                        							 
+                        Muito obrigado por utilizar ACME Hospital!\s
+                        Volte sempre :)""");
+            }
+            case 1 -> {
+                System.out.print("Id do usuário: ");
+                try {
+                    sistemaInt.login(entrada.nextInt());
+                } catch (UserException e) {
+                    System.out.println("Usuário inválido");
+                    break;
+                }
+                if (sistemaInt.getUsuario() instanceof Administrador administrador) {
+                    System.out.print("Código de Autorização: ");
+                    int codigo = digitaOpcaoInt();
 
-		} while (opcao!=0);
-	}
+                    if (codigo != administrador.getAuthNumber()) {
+                        System.out.println("Administrador incorreto!");
+                        try {
+                            sistemaInt.logout();
+                        } catch (UserException ignore) {
+                        }
+                    }
+                }
+            }
+        }
+        return opcao;
+    }
 
-	public void escolhaAdmin() throws InvalidOption, UserException {
-		int opcao;
-		do{
-			opcao = entrada.nextInt();;
-			entrada.nextLine();
-			switch (opcao) {
-				case 0 -> {
-					System.out.println("""
-								 
-							Muito obrigado por utilizar ACME Hospital!\s
-							Volte sempre :)""");
-				}
-				case 1 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					cadastraUsuario();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 2 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					buscaMedico();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 3 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					buscaPaciente();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 4 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					estatGerais();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 5 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					checaFolhaSalarial();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 6 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					checaEstacionamento();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 7 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					trocaUsuario();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				default -> throw (new InvalidOption("""
-						Opcao Invalida :/
-						Por favor, digite novamente.
-											 
-						Reiniciando menu...\s"""));
-			}
-		} while (opcao!=0);
-	}
+    public void menuInicial() {
+        System.out.println("""                				
+                \n[0] Sair do sistema\s
+                [1] Login\s""");
+    }
 
-	private void cadastraUsuario() {
-		int opcao = digitaOpcaoInt();
-		entrada.nextLine();
-		System.out.println("""
-				
-				Vamos comecar o cadastro de um novo usuario!\s
-				
-				> Voce quer cadastrar:\s
-				[1] Administrador
-				[2] Medico\s
-				[3] Paciente\s
-				""");
-		switch (opcao) {
-			case 1 -> {
-				System.out.print("\nDigite o nome: \n> ");
-				String nome = entrada.nextLine();
-				entrada.nextLine();
-				System.out.print("""
+    public void menuAdm() {
+        System.out.println(""" 				
+                > MENU ADMINISTRADOR\s
+                				
+                O que deseja fazer?\s
+                (Selecione a opcao abaixo digitando o numero indicado)\s
+                				
+                [0] Sair do sistema\s
+                [1] Cadastrar novo usuario\s
+                [2] Buscar por nome\s
+                [3] Estatisticas gerais\s
+                [4] Ver folha salarial dos funcionarios\s
+                [5] Checar vagas do estacionamento do hospital\s
+                [6] Trocar de usuario\s
+                				
+                Digite a opcao desejada:\s""");
+    }
 
-						Digite o cpf:\s
-						(digite no formato - 000.000.000-00)
+    private void trocaUsuario() {
+        try {
+            sistemaInt.logout();
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-						 >\s""");
-				String cpf = entrada.nextLine();
-				System.out.println("""
-						
-						Voce esta estacionado no estacionamento?
-						
-						[Y] Sim\s
-						[N] Nao\s""");
-				char c = digitaOpcaoChar();
-				switch (c) {
-					case 'Y' -> {
-						boolean estacionado = true;
-					}
-					case 'N' -> {
-						System.out.println("\nQuantidade de vagas disponiveis " +
-								"no estacionamento do hospital: " + checaEstacionamento());
-					}
-				}
-			}
-		}
-	}
+    public int escolhaAdmin() {
+        menuAdm();
+        int opcao = entrada.nextInt();
+        switch (opcao) {
+            case 0 -> {
+                System.out.println("""
+                        	 
+                        Muito obrigado por utilizar ACME Hospital!\s
+                        Volte sempre :)""");
+            }
+            case 1 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                try {
+                    cadastraUsuario();
+                } catch (UserException e) {
+                    System.out.println(e.getMessage());
+                    Usuario.invalidarUsuario();
+                }
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 2 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                buscaPorNome();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 3 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                estatGerais();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 4 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                checaFolhaSalarial();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 5 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                checaEstacionamento();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 6 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                trocaUsuario();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            default -> System.out.println("Opção inválida!");
+        }
+        return opcao;
+    }
 
-	private void buscaMedico() {
-	}
+    private void cadastraUsuario() throws UserException {
+        System.out.println("""
+                				
+                Vamos comecar o cadastro de um novo usuario!\s
+                				
+                > Voce quer cadastrar:\s
+                [1] Administrador
+                [2] Medico\s
+                [3] Paciente\s
+                """);
+        int opcao = digitaOpcaoInt();
+        entrada.nextLine();
 
-	private void buscaPaciente() {
-	}
+        switch (opcao) {
+            case 1 -> {
+                System.out.print("\nDigite o nome: ");
+                String nome = entrada.nextLine();
+                entrada.nextLine();
+                System.out.print("\nDigite o salário: ");
+                double salario = entrada.nextDouble();
 
-	private void estatGerais() {
-	}
+                System.out.print("\nDigite o código de autenticação: ");
+                int authnumber = entrada.nextInt();
 
-	private void checaFolhaSalarial(){
-	}
+                System.out.println("""
+                        						
+                        Voce esta estacionado no estacionamento?
+                        						
+                        [Y] Sim\s
+                        [N] Nao\s""");
+                boolean valido;
+                boolean estacionado = false;
+                do {
+                    valido = true;
+                    char c = digitaOpcaoChar();
 
-	private int checaEstacionamento(){
-		return 0;
-	}
+                    switch (c) {
+                        case 'Y' -> {
+                            estacionado = true;
+                        }
+                        case 'N' -> {
+                            checaEstacionamento();
+                        }
+                        default -> valido = false;
+                    }
+                } while (!valido);
+                sistemaInt.addUsuario(new Administrador(nome, salario, estacionado, authnumber));
+            }
+            case 2 -> {
+                System.out.print("\nDigite o nome: ");
+                String nome = entrada.nextLine();
+                System.out.print("\nDigite o salário: ");
+                double salario = entrada.nextDouble();
 
-	public void menuMed() throws UserException {
-		sistemaInt.login(usuarioAtual.getId());
-		System.out.println("""
-    
-				\n>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-				
-				> Voce entrou como: MEDICO\s
-				
-				>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-				
-				> MENU MEDICO\s
-				
-				O que deseja fazer?\s
-				(Selecione a opcao abaixo digitando o numero indicado)\s
-				
-				[0] Sair do sistema\s
-				[1] Listar TODAS autorizacoes de exames\s
-				[2] Listar autorizacoes de exame POR PACIENTE\s
-				[3] Listar autorizacoes de exame POR TIPO DE EXAME\s
-				[4] Trocar de usuario\s
-				
-				Digite a opcao desejada:\040""");
-		try {
-			escolhaMed();
-		} catch (Exception a) {
-			System.err.println("Ocorreu um erro: " + a);
-		}
-	}
+                int i = 0;
 
-	public void escolhaMed() throws InvalidOption, UserException {
-		int opcao;
-		Paciente p = null;
-		TipoExames te = null;
-		do {
-			opcao = digitaOpcaoInt();
-			entrada.nextLine();
-			switch (opcao) {
-				case 0 -> {
-					System.out.println("""
-								 
-							Muito obrigado por utilizar ACME Hospital!\s
-							Volte sempre :)""");
-				}
-				case 1 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					listaAutorizacoes();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 2 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					listaAutorizacoes(p);
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 3 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					listaAutorizacoes(te);
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 4 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					trocaUsuario();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				default -> throw (new InvalidOption("""
-						Opcao Invalida :/
-						Por favor, digite novamente.
-											 
-						Reiniciando menu...\s"""));
-			}
-		} while (opcao != 0);
-	}
+                for (Especializacao e : Especializacao.values()) {
+                    System.out.printf("[%d] %s", i++, e.getNome());
+                }
 
-	private void listaAutorizacoes() {
-	}
+                Especializacao especializacao;
 
-	private void listaAutorizacoes(Paciente paciente) {
-	}
+                do {
+                    try {
+                        System.out.print("Especialização: ");
+                        especializacao = Especializacao.values()[digitaOpcaoInt()];
+                    } catch (IndexOutOfBoundsException e) {
+                        System.out.println("Especialização invalida!");
+                        especializacao = null;
+                    }
+                } while (especializacao == null);
 
-	private void listaAutorizacoes(TipoExames tipo) {
-	}
+                System.out.println("""
+                        						
+                        Voce esta estacionado no estacionamento?
+                        						
+                        [Y] Sim\s
+                        [N] Nao\s""");
+                boolean valido;
+                boolean estacionado = false;
+                do {
+                    valido = true;
+                    char c = digitaOpcaoChar();
 
-	public void menuPac() throws UserException {
-		sistemaInt.login(usuarioAtual.getId());
-		System.out.println("""
-    
-				\n>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-				
-				> Voce entrou como: PACIENTE\s
-				
-				>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<\s
-				
-				> MENU PACIENTE\s
-				
-				O que deseja fazer?\s
-				(Selecione a opcao abaixo digitando o numero indicado)\s
-				
-				[0] Sair do sistema\s
-				[1] Marcar exame como realizado\s
-				[2] Listar minhas autorizacoes de exame\s
-				[3] Trocar de usuario\s
-				
-				Digite a opcao desejada:\040""");
+                    switch (c) {
+                        case 'Y' -> {
+                            estacionado = true;
+                        }
+                        case 'N' -> {
+                            checaEstacionamento();
+                        }
+                        default -> valido = false;
+                    }
+                } while (!valido);
+                sistemaInt.addUsuario(new Medico(nome, salario, especializacao, estacionado));
+            }
 
-		try {
-			escolhaPac();
-		} catch (Exception a) {
-			System.err.println("Ocorreu um erro: " + a);
-		}
-	}
+            case 3 -> {
+                System.out.print("\nDigite o nome: ");
+                String nome = entrada.nextLine();
 
-	public void escolhaPac() throws InvalidOption, UserException {
-		int opcao;
-		Paciente p = null;
-		do {
-			opcao = digitaOpcaoInt();
-			entrada.nextLine();
-			switch (opcao) {
-				case 0 -> {
-					System.out.println("""
-								 
-							Muito obrigado por utilizar ACME Hospital!\s
-							Volte sempre :)""");
-				}
-				case 1 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					exameRealizado();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 2 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					listaMinhasAutorizacoes(p);
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				case 3 -> {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-					trocaUsuario();
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
-				}
-				default -> throw (new InvalidOption("""
-						Opcao Invalida :/
-						Por favor, digite novamente.
-											 
-						Reiniciando menu...\s"""));
-			}
-		} while (opcao != 0);
-	}
+                System.out.println("CPF: ");
+                String cpf = entrada.nextLine();
 
-	private void exameRealizado() {
-	}
+                sistemaInt.addUsuario(new Paciente(nome, cpf));
 
-	private void listaMinhasAutorizacoes(Paciente p) {
-	}
+            }
+            default -> System.out.println("Opção inválida!");
+        }
+    }
 
-	private int digitaOpcaoInt(){
-		return entrada.nextInt();
-	}
+    private void buscaPorNome() {
+        System.out.println("Nome: ");
+        entrada.nextLine();
+        TemAutorizacoes usuario;
+        try {
+            usuario = sistemaInt.listPacienteMedicoPorNome(entrada.nextLine());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
-	private char digitaOpcaoChar() {
-		return entrada.next().charAt(0);
-	}
+        System.out.println(usuario);
+
+        for (Autorizacao autorizacao : usuario.getAutorizacoes()) {
+            System.out.println(autorizacao);
+        }
+    }
+
+
+    private void estatGerais() {
+        try {
+            System.out.printf("Número de Médicos: %d\n" +
+                    "Número de Pacientes: %d\n" +
+                    "Número de Autorizações emitidas: %d\n" +
+                    "Percentual de exames realizados: %.2f%%\n", sistemaInt.quantMedico(), sistemaInt.quantPaciente(), sistemaInt.quantAutorizacoes(), sistemaInt.percentualAutorizacoesRealizadas());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void checaFolhaSalarial() {
+        try {
+            System.out.println("Folha salárial: R$ " + sistemaInt.folhaSalarial());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void checaEstacionamento() {
+        try {
+            System.out.println("Vagas disponíveis: " + sistemaInt.vagasLivresNoEstacionamento());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void menuMed() {
+        System.out.println("""			
+                > MENU MEDICO\s
+                				
+                O que deseja fazer?\s
+                (Selecione a opcao abaixo digitando o numero indicado)\s
+                				
+                [0] Sair do sistema\s
+                [1] Listar autorizacoes de exame POR PACIENTE\s
+                [2] Listar autorizacoes de exame POR TIPO DE EXAME\s
+                [3] Adicionar autorização\s
+                [4] Trocar de usuario\s
+                				
+                Digite a opcao desejada:\040""");
+    }
+
+    public int escolhaMed() {
+        menuMed();
+        int opcao = digitaOpcaoInt();
+        entrada.nextLine();
+        switch (opcao) {
+            case 0 -> {
+                System.out.println("""
+                        	 
+                        Muito obrigado por utilizar ACME Hospital!\s
+                        Volte sempre :)""");
+            }
+            case 1 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                listaAutorizacoesPorPaciente();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 2 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                listaAutorizacoesPorTipo();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 3 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                adicionarAutorizacao();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 4 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                trocaUsuario();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            default -> System.out.println("Opção inválida!");
+        }
+        return opcao;
+    }
+
+    private void adicionarAutorizacao() {
+        Paciente paciente = getPaciente();
+        Exame exame = new Exame(getTipoExames());
+        Medico medico = (Medico) sistemaInt.getUsuario();
+
+        try {
+            sistemaInt.addAutorizacao(new Autorizacao(new Date(), medico, paciente, exame));
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+            Autorizacao.invalidarAutorizacao();
+        }
+    }
+
+    private void listaAutorizacoesPorPaciente() {
+        Paciente paciente = getPaciente();
+
+        ArrayList<Autorizacao> autorizacaos;
+
+        try {
+            autorizacaos = sistemaInt.listaAutorizacaoPaciente(paciente.getCpf());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        autorizacaos.forEach(System.out::println);
+    }
+
+    private Paciente getPaciente() {
+        ArrayList<Paciente> pacientes;
+        try {
+            pacientes = sistemaInt.listarPacientes();
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        int i = 0;
+
+        for (Paciente p : pacientes)
+            System.out.printf("[%d] %s\n", i++, p.getCpf());
+
+        System.out.println("Paciente você deseja ver as autorizações: ");
+
+        Paciente paciente = null;
+
+        do {
+            try {
+                System.out.print("Paciente: ");
+                paciente = pacientes.get(digitaOpcaoInt());
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Paciente inválido!");
+                pacientes = null;
+            }
+        } while (paciente == null);
+        return paciente;
+    }
+
+    private void listaAutorizacoesPorTipo() {
+        TipoExames tipoExames = getTipoExames();
+
+        ArrayList<Autorizacao> autorizacaos;
+
+        try {
+            autorizacaos = sistemaInt.listaAutorizacaoTipo(tipoExames);
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        autorizacaos.forEach(System.out::println);
+    }
+
+    private TipoExames getTipoExames() {
+        int i = 0;
+
+        for (TipoExames tipoExames : TipoExames.values()) {
+            System.out.printf("[%d] %s\n", i++, tipoExames.getNome());
+        }
+
+        System.out.println("Tipo de exame você deseja ver as autorizações: ");
+
+        TipoExames tipoExames;
+
+        do {
+            try {
+                System.out.print("Tipo de Exame: ");
+                tipoExames = TipoExames.values()[digitaOpcaoInt()];
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Tipo de exame inválido!");
+                tipoExames = null;
+            }
+        } while (tipoExames == null);
+        return tipoExames;
+    }
+
+    public void menuPac() {
+        System.out.println("""
+                > MENU PACIENTE\s
+                				
+                O que deseja fazer?\s
+                (Selecione a opcao abaixo digitando o numero indicado)\s
+                				
+                [0] Sair do sistema\s
+                [1] Marcar exame como realizado\s
+                [2] Listar minhas autorizacoes de exame\s
+                [3] Trocar de usuario\s
+                				
+                Digite a opcao desejada:\040""");
+    }
+
+    public int escolhaPac() {
+        menuPac();
+        int opcao = digitaOpcaoInt();
+        entrada.nextLine();
+        switch (opcao) {
+            case 0 -> {
+                System.out.println("""
+                        	 
+                        Muito obrigado por utilizar ACME Hospital!\s
+                        Volte sempre :)""");
+            }
+            case 1 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                exameRealizado();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 2 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                listaMinhasAutorizacoes();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            case 3 -> {
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+                trocaUsuario();
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<\n");
+            }
+            default -> System.out.println("Opção Inválida!");
+        }
+
+        return opcao;
+    }
+
+    private void exameRealizado() {
+        System.out.print("Código da autorização: ");
+        try {
+            sistemaInt.realizarExame(digitaOpcaoInt(), new Date());
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void listaMinhasAutorizacoes() {
+        try {
+            sistemaInt.listarMinhasAutorizacoes();
+        } catch (UserException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private int digitaOpcaoInt() {
+        return entrada.nextInt();
+    }
+
+    private char digitaOpcaoChar() {
+        return entrada.next().charAt(0);
+    }
 }

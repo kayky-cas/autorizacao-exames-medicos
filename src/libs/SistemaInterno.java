@@ -22,6 +22,17 @@ public class SistemaInterno {
         this.estacionamento = estacionamento;
     }
 
+    public SistemaInterno(int estacionamento, ArrayList<Usuario> usuarios) {
+        this.usuarios = usuarios;
+        this.usuario = null;
+        this.autorizacoes = new ArrayList<>();
+        this.estacionamento = estacionamento;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     private void isLogado() throws UserException {
         if (usuario == null)
             throw new UserException("Nenhum usuário logado!");
@@ -185,8 +196,7 @@ public class SistemaInterno {
     }
 
     public ArrayList<Autorizacao> listarMinhasAutorizacoes() throws UserException {
-        validUsuario(usuario.isPaciente());
-        validMedico();
+        validUsuario(usuario instanceof TemAutorizacoes);
 
         return ((Paciente) usuario).getAutorizacoes();
     }
@@ -196,7 +206,7 @@ public class SistemaInterno {
         return (int) (mili / 1000 / 60 / 60 / 24);
     }
 
-    private int vagasLivresNoEstacionamento() throws UserException {
+    public int vagasLivresNoEstacionamento() throws UserException {
         validAdmin();
 
         int quant = 0;
@@ -207,4 +217,16 @@ public class SistemaInterno {
 
         return estacionamento - quant;
     }
+
+    public ArrayList<Paciente> listarPacientes() throws UserException {
+        validMedico();
+
+        ArrayList<Paciente> pacientes = new ArrayList<>();
+
+        for (Usuario usuario : usuarios)
+            if (usuario.isPaciente())
+                pacientes.add((Paciente) usuario);
+        return pacientes;
+    }
+
 }
